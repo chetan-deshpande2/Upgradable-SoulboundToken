@@ -11,9 +11,11 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
 
   for (const account of accounts) {
-    console.log(process.env.POLYGON_RPC_URL);
+    console.log(account.address);
   }
 });
+
+
 
 module.exports = {
   solidity: {
@@ -25,10 +27,6 @@ module.exports = {
       },
     },
   },
-  gasReporter: {
-    currency: "MATIC",
-    gasPrice: 21,
-  },
   plugins: ["solidity-coverage"],
 
   networks: {
@@ -37,6 +35,7 @@ module.exports = {
     matic: {
       url: POLYGON_RPC_URL,
       accounts: [PRIVATE_KEY],
+      
     },
   },
   etherscan: {
