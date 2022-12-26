@@ -3,8 +3,8 @@ const hre = require("hardhat");
 
 async function main() {
 
-  const SoulBoundToken = await hre.ethers.getContractFactory("Test")
-  const soulToken = await SoulBoundToken.deploy("Test","TST","V1")
+  const SoulBoundToken = await hre.ethers.getContractFactory("Certificate")
+  const soulToken = await SoulBoundToken.deploy("Test", "TST", "V1")
 
   await soulToken.deployed();
 
