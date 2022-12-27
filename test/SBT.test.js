@@ -6,10 +6,11 @@ const { getSignature } = require('../lib/genrateSig')
 const MetaData =
     "https://gateway.pinata.cloud/ipfs/QmcFc5kmpbRvhoQjfUfR2PmUotJQsz3s83rt22529xnvcB";
 
-let Certificate, certificate, owner, addr1, addr2;
+let Certificate, certificate, owner, issuer, claimant;
 
 const privateKey =
     "1f5deadd9e3e400c6f1139a9b43e328cecfec331285a89d78eb25a96f77e07b8";
+
 
 const Name = "Certificate"
 const Symbol = "CTS"
@@ -26,20 +27,18 @@ const getChainId = async () => {
     return getId.chainId
 }
 
-const genrateCompactSigature = async (signer, ...args) => {
-    console.log("===>", args.owner)
-    const signatureValues = await toTypedSignature(...args)
+const genrateCompactSigature = async (issuer) => {
+    const signatureValues = await toTypedSignature()
 
-    // const signature = await signer._signTypedData(signatureValues.domain, signatureValues.types, signatureValues.agreement);
-    // const { compact } = utils.splitSignature(signature);
-    // return compact;
+    const signature = await issuer._signTypedData(signatureValues.domain, signatureValues.types, signatureValues.agreement);
+    const { compact } = utils.splitSignature(signature);
+    return compact;
+
 
 }
 
-const toTypedSignature = async (
-    getAddressOfContract, owner, addr2, chainId
-) => {
-    console.log("=============>", getAddressOfContract, owner.address, addr2.address, chainId)
+const toTypedSignature = async () => {
+    const chianId = await getChainId()
     const types = {
         Agreement: [
             { name: "active", type: "address" },
@@ -50,13 +49,13 @@ const toTypedSignature = async (
     const domain = {
         name: Name,
         version: Version,
-        chainId: chainId,
-        verifyingContract: getAddressOfContract,
+        chainId: chianId,
+        verifyingContract: certificate.address,
     };
 
     const agreement = {
-        active: addr1.address,
-        passive: addr2.address,
+        active: claimant.address,
+        passive: issuer.address,
         tokenURI: MetaData,
     };
 
@@ -68,7 +67,7 @@ const toTypedSignature = async (
 
 describe("Certifications ", async () => {
     beforeEach(async () => {
-        [owner, addr1, addr2] = await ethers.getSigners();
+        [owner, issuer, claimant] = await ethers.getSigners();
         signer = new ethers.Wallet(privateKey)
 
         Certificate = await ethers.getContractFactory("Certificate")
@@ -84,18 +83,31 @@ describe("Certifications ", async () => {
         })
     })
 
+    describe("Match Hash", () => {
+        it("Should Match Off-Chain Hash with On-Chain Hash", async () => {
+            const typedData = await toTypedSignature()
+            const offChainHash = utils._TypedDataEncoder.hash(
+                typedData.domain, typedData.types, typedData.agreement
+            )
+            const onChainHash = await certificate._getHash(typedData.agreement.active, typedData.agreement.passive, typedData.agreement.tokenURI)
+            expect(offChainHash).to.equal(onChainHash)
+        })
+
+    })
+
     describe("Give Certificate", () => {
         it("should able to give certificate", async () => {
-            const chainId = await getChainId()
-            const getAddressOfContract = certificate.address
-            const args = [getAddressOfContract, chainId, owner, addr2]
-            const getSign = await genrateCompactSigature(signer, ...args)
-            // console.log(getSign)
+            const getSign = await genrateCompactSigature(issuer)
+            const typedData = await toTypedSignature()
+            console.log(getSign)
+            const giveCertificate = await certificate.connect(claimant).give(typedData.agreement.passive, typedData.agreement.tokenURI, getSign)
 
 
         })
 
     })
+
+
 
 })
 
