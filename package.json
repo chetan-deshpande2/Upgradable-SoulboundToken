@@ -10,6 +10,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.0",
     "@openzeppelin/contracts-upgradeable": "^4.8.0",
+    "@openzeppelin/hardhat-upgrades": "^1.22.0",
     "dotenv": "^16.0.3",
     "nodemon": "^2.0.20"
   }
