@@ -1,13 +1,13 @@
-require("@nomicfoundation/hardhat-toolbox");
-require("@nomiclabs/hardhat-etherscan");
-require("hardhat-gas-reporter");
-require("dotenv").config();
-require("solidity-coverage");
+require('@nomicfoundation/hardhat-toolbox');
+require('@openzeppelin/hardhat-upgrades');
+require('@nomiclabs/hardhat-etherscan');
+require('hardhat-gas-reporter');
+require('dotenv').config();
+require('solidity-coverage');
 
 const { PRIVATE_KEY, POLYGON_API_KEY, POLYGON_RPC_URL } = process.env;
 
-
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
+task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
 
   for (const account of accounts) {
@@ -15,11 +15,9 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   }
 });
 
-
-
 module.exports = {
   solidity: {
-    version: "0.8.16",
+    version: '0.8.16',
     settings: {
       optimizer: {
         enabled: true,
@@ -27,7 +25,7 @@ module.exports = {
       },
     },
   },
-  plugins: ["solidity-coverage"],
+  plugins: ['solidity-coverage'],
 
   networks: {
     hardhat: {},
@@ -35,7 +33,6 @@ module.exports = {
     matic: {
       url: POLYGON_RPC_URL,
       accounts: [PRIVATE_KEY],
-      
     },
   },
   etherscan: {
