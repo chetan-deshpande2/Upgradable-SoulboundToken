@@ -9,6 +9,7 @@ import {BitMaps} from "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 
 import {IERC721Metadata} from "./interfaces/IERC721Metadata.sol";
 import {IERC4973} from "./interfaces/IERC4973.sol";
+import "hardhat/console.sol";
 
 contract Certificate is EIP712, ERC165, IERC721Metadata, IERC4973 {
     using BitMaps for BitMaps.BitMap;
@@ -120,7 +121,6 @@ contract Certificate is EIP712, ERC165, IERC721Metadata, IERC4973 {
     ) public virtual returns (uint256) {
         bytes32 hash = _getHash(active, passive, uri);
         uint256 tokenId = uint256(hash);
-
         require(
             SignatureChecker.isValidSignatureNow(passive, hash, signature),
             "_safeCheckAgreement: invalid signature"
