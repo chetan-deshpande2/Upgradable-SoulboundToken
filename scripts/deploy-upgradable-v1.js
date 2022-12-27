@@ -1,4 +1,4 @@
-const { ethers, upgrades } = require('hardhat');
+const { ethers, run, upgrades } = require('hardhat');
 
 async function main() {
   const CertificationV1 = await ethers.getContractFactory(
@@ -15,6 +15,12 @@ async function main() {
   await certificate.deployed();
 
   console.log(`Certificate Contract Deployed At ${certificate.address}`);
+
+  const verifyContract = await run('verify:verify', {
+    address: certificate.address,
+  });
+
+  console.log(`Verified Contract Address ${certificate.address}`);
 }
 
 main();
