@@ -7,4 +7,5 @@ typechain-types
 cache
 artifacts
 .openzeppelin
+.env
 
